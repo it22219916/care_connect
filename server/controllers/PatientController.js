@@ -1,6 +1,7 @@
 const Patient = require("../models/patient.js");
 const Prescription = require("../models/prescription.js");
 const User = require("../models/user.js");
+const QRCode = require('qrcode');
 
 const getPatients = async (req, res) => {
 
@@ -78,47 +79,53 @@ const isPatientValid = (newPatient) => {
 
 }
 
-const savePatient = async (req, res) => {
-    let newPatient = req.body;
-    let PatientValidStatus = isPatientValid(newPatient);
-    if (!PatientValidStatus.status) {
-        res.status(400).json({
-            message: 'error',
-            errors: PatientValidStatus.errors
-        });
-    }
-    else {
-        //const patient = new Patient(req.body);
-        User.create(
-            {
-                email: newPatient.email,
-                username: newPatient.username,
-                firstName: newPatient.firstName,
-                lastName: newPatient.lastName,
-                password: newPatient.password,
-                userType: 'Patient',
-                activated: 1,
-            },
-            (error, userDetails) => {
-                if (error) {
-                    res.status(400).json({ message: "error", errors: [error.message] });
-                } else {
-                    newPatient.userId = userDetails._id,
-                        Patient.create(newPatient,
-                            (error2, patientDetails) => {
-                                if (error2) {
-                                    User.deleteOne({ _id: userDetails });
-                                    res.status(400).json({ message: 'error', errors: [error2.message] });
-                                } else {
-                                    res.status(201).json({ message: 'success' });
-                                }
-                            }
-                        );
-                }
-            }
-        );
-    }
-}
+// const savePatient = async (req, res) => {
+//     let newPatient = req.body;
+//     let PatientValidStatus = isPatientValid(newPatient);
+    
+//     console.log("PatientValidStatus check");
+
+//     if (!PatientValidStatus.status) {
+//         res.status(400).json({
+//             message: 'error',
+//             errors: PatientValidStatus.errors
+//         });
+//     }
+//     else {
+//         //const patient = new Patient(req.body);
+//         User.create(
+//             {
+//                 email: newPatient.email,
+//                 username: newPatient.username,
+//                 firstName: newPatient.firstName,
+//                 lastName: newPatient.lastName,
+//                 password: newPatient.password,
+//                 userType: 'Patient',
+//                 activated: 1,
+//             },
+//             (error, userDetails) => {
+//                 if (error) {
+//                     res.status(400).json({ message: "error", errors: [error.message] });
+//                     console.log("Error creating user");
+//                 } else {
+//                     newPatient.userId = userDetails._id,
+//                         Patient.create({ newPatient, qrCode: _qrCode },
+//                             (error2, patientDetails) => {
+//                                 if (error2) {
+//                                     User.deleteOne({ _id: userDetails });
+//                                     res.status(400).json({ message: 'error', errors: [error2.message] });
+//                                 } else {
+//                                     res.status(201).json({ message: 'success' });
+//                                     console.log("Patient created successfully");
+                                    
+//                                 }
+//                             }
+//                         );
+//                 }
+//             }
+//         );
+//     }
+// }
 
 const updatePatient = async (req, res) => {
     let newPatient = req.body;
@@ -192,7 +199,7 @@ const getPatientHistory = async (req, res) => {
 module.exports = {
     getPatients,
     getPatientById,
-    savePatient,
+    // savePatient,
     updatePatient,
     deletePatient,
     getPatientHistory

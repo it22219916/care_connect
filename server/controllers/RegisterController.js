@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Doctor = require("../models/doctor");
 const Patient = require("../models/patient");
+const QRCode = require('qrcode');
 
 
 const crypto = require('crypto');
@@ -74,11 +75,13 @@ const generateVerificationToken = () => {
 
 // Send an email with a verification link
 const sendVerificationEmail = async (email, token) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
+    //server.js
+    const  transporter = nodemailer.createTransport({
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
         auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASS
+        user: "e076a8db0b5c68",
+        pass: "2a6b091df72f4c"
         }
     });
 
@@ -94,13 +97,14 @@ const sendVerificationEmail = async (email, token) => {
     return resp;
 };
 
-const signUp = (req, res) => {
+const signUp = async (req, res) => {
     const newUser = req.body;
 
     const userValidStatus = isUserValid(newUser);
     if (!userValidStatus.status) {
         res.json({ message: "error", errors: userValidStatus.errors });
     } else {
+        
         User.create(
             {
                 email: newUser.email,
@@ -110,7 +114,7 @@ const signUp = (req, res) => {
                 password: newUser.password,
                 userType: newUser.userType,
             },
-            (error, userDetails) => {
+            async (error, userDetails) => {
                 if (error) {
                     res.json({ message: "error", errors: [error.message] });
                 } else {
@@ -138,13 +142,17 @@ const signUp = (req, res) => {
                         );
                     }
                     if (newUser.userType === "Patient") {
+
+                        const qrcode = await QRCode.toDataURL(userDetails._id.toString()); // Await the QR code generation
+
                         Patient.create(
                             {
                                 userId: userDetails._id,
                                 firstName: newUser.firstName,
                                 lastName: newUser.lastName,
                                 email: newUser.email,
-                                username: newUser.email
+                                username: newUser.email,
+                                qrCode:qrcode // Store the QR code data URL here
                             },
                             (error2, patientDetails) => {
                                 if (error2) {
