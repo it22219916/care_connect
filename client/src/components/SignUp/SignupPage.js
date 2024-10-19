@@ -3,7 +3,8 @@ import styles from './SignUp.module.css';
 import { NavLink } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import ErrorDialogueBox from '../MUIDialogueBox/ErrorDialogueBox';
-
+import { QRCodeCanvas } from 'qrcode.react'; // Import the QR code component
+import { Modal } from '@mui/material';  // Import the modal component from Material UI
 
 
 function SignupPage() {
@@ -18,6 +19,8 @@ function SignupPage() {
   const [passwordMatchDisplay, setPasswordMatchDisplay] = useState('none');
   // const [passwordValidationDisplay, setPasswordValidationDisplay] = useState('none')
   const [passwordValidationMessage, setPasswordValidationMessage] = useState('')
+  const [qrCode, setQrCode] = useState(''); // State to hold the QR code data
+  const [qrCodeOpen, setQrCodeOpen] = useState(false); // Control QR code modal visibility
 
 
   const [errorDialogueBoxOpen, setErrorDialogueBoxOpen] = useState(false);
@@ -30,6 +33,13 @@ function SignupPage() {
     setErrorDialogueBoxOpen(false)
   };
 
+  const handleQrCodeOpen = () => setQrCodeOpen(true); // Open QR code modal
+  const handleQrCodeClose = () => setQrCodeOpen(false); // Close QR code modal
+
+  const handleProceedToLogin = () => {
+    setQrCodeOpen(false); // Close modal first
+    navigate("/login"); // Then navigate to login
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -54,10 +64,9 @@ function SignupPage() {
       .then(data => {
         let respMessage = data.message;
         if (respMessage === "success") {
-          navigate("/");
-        }
-        else {
-          //TODO: display error message
+          setQrCode(data.qrCode); // Set the received QR code
+          handleQrCodeOpen(); // Open the QR code modal
+        } else {
           setErrorList(data.errors);
           handleDialogueOpen();
         }
@@ -196,6 +205,24 @@ function SignupPage() {
 
         </form>
       </div>
+      {/* QR Code Modal */}
+      <Modal
+        open={qrCodeOpen}
+        onClose={handleQrCodeClose}
+        aria-labelledby="qr-code-modal-title"
+        aria-describedby="qr-code-modal-description"
+      >
+        <div className={styles.modalContainer}>
+          <h2 id="qr-code-modal-title">Your QR Code</h2>
+          <p>This QR code contains your account details. A doctor or receptionist can scan it to retrieve your information.</p>
+          <QRCodeCanvas value={qrCode} size={256} /> {/* Display the QR code */}
+          <div className={styles.modalButtons}>
+            <button className="proceed" onClick={handleProceedToLogin}>Proceed to Login</button> {/* Proceed to login button */}
+            <button className="close" onClick={handleQrCodeClose}>Close</button> {/* Close the modal */}
+          </div>
+        </div>
+      </Modal>
+
       <ErrorDialogueBox
         open={errorDialogueBoxOpen}
         handleToClose={handleDialogueClose}
