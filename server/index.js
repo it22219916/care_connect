@@ -6,11 +6,14 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
+// patient end points
 const getAllPatients = require("./routes/api/getAllPatients");
 const getPatientByID = require("./routes/api/getPatientByID");
 const createPatient = require("./routes/api/createPatient");
 const editPatientByID = require("./routes/api/editPatientByID");
 const deletePatientByID = require("./routes/api/deletePatientByID");
+
+
 const LoginRegisterRoute = require("./routes/LoginRegisterRoute.js");
 const UserRoute = require("./routes/UserRoute.js");
 const DashboardRoute = require("./routes/DashboardRoute.js");
