@@ -20,6 +20,7 @@ const PatientSchema = new Schema({
   dob: {
     type: String
   }
+
 });
 
 //hashing password

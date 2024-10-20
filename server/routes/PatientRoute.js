@@ -8,7 +8,7 @@ const {
     savePatient,
     updatePatient,
     deletePatient,
-    getPatientHistory
+    getPatientHistory,
 } = require('../controllers/PatientController.js')
 
 

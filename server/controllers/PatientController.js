@@ -2,6 +2,7 @@ const Patient = require("../models/patient.js");
 const Prescription = require("../models/prescription.js");
 const User = require("../models/user.js");
 
+
 const getPatients = async (req, res) => {
 
     try {
@@ -81,6 +82,9 @@ const isPatientValid = (newPatient) => {
 const savePatient = async (req, res) => {
     let newPatient = req.body;
     let PatientValidStatus = isPatientValid(newPatient);
+    
+    console.log("PatientValidStatus check");
+
     if (!PatientValidStatus.status) {
         res.status(400).json({
             message: 'error',
@@ -102,6 +106,7 @@ const savePatient = async (req, res) => {
             (error, userDetails) => {
                 if (error) {
                     res.status(400).json({ message: "error", errors: [error.message] });
+                    console.log("Error creating user");
                 } else {
                     newPatient.userId = userDetails._id,
                         Patient.create(newPatient,
@@ -111,6 +116,8 @@ const savePatient = async (req, res) => {
                                     res.status(400).json({ message: 'error', errors: [error2.message] });
                                 } else {
                                     res.status(201).json({ message: 'success' });
+                                    console.log("Patient created successfully");
+                                    
                                 }
                             }
                         );

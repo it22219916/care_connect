@@ -46,7 +46,7 @@ input[type=checkbox] {
     border: 1px black solid !important;
     border-radius: 3px !important;
     /* background-color: */
-}
+}  
 
 #signUpBtn {
     padding: 10px 60px;
@@ -60,6 +60,46 @@ input[type=checkbox] {
     transition: all .1s ease-in-out;
     transform: scale(1.1)
 }
+
+.modalContainer {
+    background-color: white;
+    padding: 40px;
+    margin: 100px auto;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modalButtons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  
+  button.close, button.proceed {
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button.proceed {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  button.close {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  button.proceed:hover {
+    background-color: #218838;
+  }
+  
+  button.close:hover {
+    background-color: #5a6268;
+  }
 
 @media screen and (max-width:1000px) {
     #signUpBody {

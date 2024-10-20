@@ -2,7 +2,6 @@ const User = require("../models/user");
 const Doctor = require("../models/doctor");
 const Patient = require("../models/patient");
 
-
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
@@ -74,11 +73,13 @@ const generateVerificationToken = () => {
 
 // Send an email with a verification link
 const sendVerificationEmail = async (email, token) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
+    //server.js
+    const  transporter = nodemailer.createTransport({
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
         auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASS
+        user: "e076a8db0b5c68",
+        pass: "2a6b091df72f4c"
         }
     });
 
@@ -94,74 +95,63 @@ const sendVerificationEmail = async (email, token) => {
     return resp;
 };
 
-const signUp = (req, res) => {
+const signUp = async (req, res) => {
     const newUser = req.body;
 
     const userValidStatus = isUserValid(newUser);
     if (!userValidStatus.status) {
-        res.json({ message: "error", errors: userValidStatus.errors });
-    } else {
-        User.create(
-            {
-                email: newUser.email,
-                username: newUser.email,
+        return res.json({ message: "error", errors: userValidStatus.errors });
+    }
+
+    try {
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email: newUser.email });
+        if (existingUser) {
+            return res.json({ message: "error", errors: ["Email already exists"] });
+        }
+
+        // Create the new user
+        const userDetails = await User.create({
+            email: newUser.email,
+            username: newUser.email,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            password: newUser.password,
+            userType: newUser.userType,
+        });
+
+        const verificationToken = generateVerificationToken();
+        await saveVerificationToken(userDetails._id, verificationToken);
+
+        if (newUser.userType === "Doctor") {
+            await Doctor.create({
+                userId: userDetails._id,
                 firstName: newUser.firstName,
                 lastName: newUser.lastName,
-                password: newUser.password,
-                userType: newUser.userType,
-            },
-            (error, userDetails) => {
-                if (error) {
-                    res.json({ message: "error", errors: [error.message] });
-                } else {
-                    let verificationToken = generateVerificationToken()
-                    saveVerificationToken(userDetails._id, verificationToken);
+                email: newUser.email,
+                username: newUser.email,
+            });
+        } else if (newUser.userType === "Patient") {
 
-                    if (newUser.userType === "Doctor") {
-                        Doctor.create(
-                            {
-                                userId: userDetails._id,
-                                firstName: newUser.firstName,
-                                lastName: newUser.lastName,
-                                email: newUser.email,
-                                username: newUser.email
-                            },
-                            (error2, doctorDetails) => {
-                                if (error2) {
-                                    User.deleteOne({ _id: userDetails });
-                                    res.json({ message: "error", errors: [error2.message] });
-                                } else {
-                                    let resp = sendVerificationEmail(userDetails.email, verificationToken.token);
-                                    res.json({ message: "success" });
-                                }
-                            }
-                        );
-                    }
-                    if (newUser.userType === "Patient") {
-                        Patient.create(
-                            {
-                                userId: userDetails._id,
-                                firstName: newUser.firstName,
-                                lastName: newUser.lastName,
-                                email: newUser.email,
-                                username: newUser.email
-                            },
-                            (error2, patientDetails) => {
-                                if (error2) {
-                                    User.deleteOne({ _id: userDetails });
-                                    res.json({ message: "error", errors: [error2.message] });
-                                } else {
-                                    let resp = sendVerificationEmail(userDetails.email, verificationToken.token);
-                                    res.json({ message: "success" });
-                                }
-                            }
-                        );
-                    }
-                }
-            }
-        );
+            await Patient.create({
+                userId: userDetails._id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                username: newUser.email,
+            });
+        }
+
+        // Send the verification email
+        await sendVerificationEmail(userDetails.email, verificationToken.token);
+
+        res.json({ message: "success" });
+    } catch (error) {
+        console.error("Error during sign-up:", error.message);
+        res.status(500).json({ message: "error", errors: [error.message] });
     }
 };
+
 
 const verifyUser = (req, res) => {
     const token = req.params.id;

@@ -1,30 +1,25 @@
 import styles from "./Dashboard.module.css";
 import { React, useState, useEffect, useContext } from "react";
-import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { UserContext } from "../../Context/UserContext";
-import { Navigate, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import BookOnlineIcon from "@mui/icons-material/BookOnline";
-import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function PatientDashboard() {
-  const { currentUser } = useContext(UserContext);
-  const [appsTodayCount, setAppsTodayCount] = useState(0);
+  const { currentUser } = useContext(UserContext); // Use currentUser._id as the user identifier
+  const [qrValue, setQrValue] = useState({currentUser}); // QR Code value
   const [firstAppointmentInFuture, setFirstAppointmentInFuture] = useState({});
-  const [bookedAppointments, setBookedAppointments] = useState([]);
-  const [patientsTreatedCount, setPatientsTreatedCount] = useState([]);
   const [prescriptions, setPrescription] = useState([]);
 
   const getAppMonth = (dateOfJoining) => {
     if (!dateOfJoining) {
       return;
     }
-    // console.log("dateOfJoining",dateOfJoining);
     let month = new Date(dateOfJoining.slice(0, -1)).getMonth();
-    // console.log("dateOfJoining",dateOfJoining);
     let monthList = [
       "January",
       "February",
@@ -46,9 +41,7 @@ export default function PatientDashboard() {
     if (!dateOfJoining) {
       return;
     }
-    // console.log("dateOfJoining",dateOfJoining);
     let date = new Date(dateOfJoining.slice(0, -1)).getDate();
-    // console.log("dateOfJoining",dateOfJoining);
     return date;
   };
 
@@ -56,125 +49,130 @@ export default function PatientDashboard() {
     if (!dateOfJoining) {
       return;
     }
-    // console.log("dateOfJoining",dateOfJoining);
     let year = new Date(dateOfJoining.slice(0, -1)).getFullYear();
-    // console.log("dateOfJoining",dateOfJoining);
     return year;
   };
 
   const getBookedSlots = async () => {
-    let response = await axios.post(
-      `http://localhost:3001/appointments`,
-      {
-        isTimeSlotAvailable: false,
-      },
-      {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    if (response.data.message == "success") {
-      // getAvailableSlot();
-      // window.alert("success add")
-      // setAvailableSlot(response.data.appointments)
-      let aptms = response.data.appointments;
-      console.log("aptms", aptms);
-      // console.log(firstAppointmentInFuture)
-      const futureAppointments = aptms.filter((appointment) => {
-        const appointmentDate = new Date(
-          appointment.appointmentDate.slice(0, -1)
-        );
-        const now = new Date();
-        return appointmentDate > now;
-      });
-      console.log("futureAppointments", futureAppointments);
-
-      if (futureAppointments && futureAppointments.length > 0) {
-        const sortedAppointments = futureAppointments.sort((a, b) => {
-          const aDate = new Date(a.appointmentDate.slice(0, -1));
-          const bDate = new Date(b.appointmentDate.slice(0, -1));
-          return aDate - bDate;
-        });
-        console.log("sortedAppointments", sortedAppointments);
-        let firstApp = sortedAppointments.find((appointment) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3001/appointments`,
+        { isTimeSlotAvailable: false },
+        {
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.message === "success") {
+        const aptms = response.data.appointments;
+        const futureAppointments = aptms.filter((appointment) => {
           const appointmentDate = new Date(
             appointment.appointmentDate.slice(0, -1)
           );
           const now = new Date();
           return appointmentDate > now;
         });
-        console.log(firstApp);
-        setFirstAppointmentInFuture(firstApp);
-      }
 
-      // setBookedAppointments(sortedAptms);
-      // console.log(aptms)
-    } else {
-      // window.alert("error add")
+        if (futureAppointments && futureAppointments.length > 0) {
+          const sortedAppointments = futureAppointments.sort((a, b) => {
+            const aDate = new Date(a.appointmentDate.slice(0, -1));
+            const bDate = new Date(b.appointmentDate.slice(0, -1));
+            return aDate - bDate;
+          });
+
+          let firstApp = sortedAppointments.find((appointment) => {
+            const appointmentDate = new Date(
+              appointment.appointmentDate.slice(0, -1)
+            );
+            const now = new Date();
+            return appointmentDate > now;
+          });
+          setFirstAppointmentInFuture(firstApp);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching booked slots", error);
     }
   };
+
   const getPrescription = async () => {
-    let response = await axios.post(
-      `http://localhost:3001/prescriptions`,
-      {},
-      {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+    try {
+      const response = await axios.post(
+        `http://localhost:3001/prescriptions`,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.message === "success") {
+        const respPrescription = response.data.prescriptions;
+        const newResp = respPrescription.sort((a, b) => {
+          const timeA = new Date(
+            `${moment(
+              new Date(a.appointmentId.appointmentDate.slice(0, -1))
+            ).format("MM/DD/YYYY")} ${a.appointmentId.appointmentTime}`
+          );
+          const timeB = new Date(
+            `${moment(
+              new Date(b.appointmentId.appointmentDate.slice(0, -1))
+            ).format("MM/DD/YYYY")} ${b.appointmentId.appointmentTime}`
+          );
+          return timeB - timeA;
+        });
+        setPrescription(newResp);
       }
-    );
-    if (response.data.message == "success") {
-      let respPrescription = response.data.prescriptions;
-      let newResp = respPrescription.sort((a, b) => {
-        const timeA = new Date(
-          `${moment(
-            new Date(a.appointmentId.appointmentDate.slice(0, -1))
-          ).format("MM/DD/YYYY")} ${a.appointmentId.appointmentTime}`
-        );
-        const timeB = new Date(
-          `${moment(
-            new Date(b.appointmentId.appointmentDate.slice(0, -1))
-          ).format("MM/DD/YYYY")} ${b.appointmentId.appointmentTime}`
-        );
-        // console.log(timeA)
-        return timeB - timeA;
-      });
-      //   console.log(newResp);
-      setPrescription(newResp);
+    } catch (error) {
+      console.error("Error fetching prescriptions", error);
     }
   };
 
   useEffect(() => {
+    if (currentUser && currentUser.userId) {
+      setQrValue(currentUser.userId); // Set the current user's ID as the QR code value
+    }
     getBookedSlots();
     getPrescription();
-  }, []);
+  }, [currentUser]);
 
   return (
-    <Box
-      className={styles.dashboardBody}
-      component="main"
-      sx={{ flexGrow: 1, p: 3 }}
-    >
+    <Box className={styles.dashboardBody} component="main" sx={{ flexGrow: 1, p: 3 }}>
       <div id={styles.welcomeBanner}>
         <div className="text-white">
           <h3>Welcome!</h3>
-          <br />
-          <h4>
-            {" "}
-            {currentUser.firstName} {currentUser.lastName}{" "}
-          </h4>
-          <br />
-          <div class={styles.horizontalLine}></div>
-          At Care Connect, we believe that every patient deserves the highest
-          quality care possible.
-          <br />
-          Our commitment to excellence in healthcare is matched only by our
-          compassion for those we serve.
+          <h4>{currentUser.firstName} {currentUser.lastName}</h4>
+          <div className={styles.horizontalLine}></div>
+          At Care Connect, we believe that every patient deserves the highest quality care possible.
+          Our commitment to excellence in healthcare is matched only by our compassion for those we serve.
         </div>
       </div>
 
+      {/* QR code section */}
+      <div className="mt-5 justify-content-center">
+        <div className="col-md-6 col-sm-12">
+          <div className="customPatientApt mx-auto">
+            <div className="topicHeader">
+              <h3 className="text-center">Your QR Code</h3>
+            </div>
+            <div className="text-center">
+              {qrValue ? (
+                <>
+                  <QRCodeCanvas value={qrValue} size={150} /> {/* Shows patient ID */}
+                  <p className="mt-3">Scan this code for your details</p>
+                </>
+              ) : (
+                <p>Loading your QR code...</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Upcoming appointment and patient history sections */}
       <div className="row mt-5 justify-content-center">
+        {/* Upcoming appointment section */}
         <div className="col-md-6 col-sm-12">
           <div className="customPatientApt mx-auto">
             <div className="topicHeader">
@@ -232,6 +230,8 @@ export default function PatientDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Patient History */}
         <div className="col-md-6 col-sm-12">
           <div className="customPatientApt mx-auto">
             <div className="topicHeader">
