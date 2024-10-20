@@ -19,9 +19,6 @@ const PatientSchema = new Schema({
   },
   dob: {
     type: String
-  },
-  qrCode: {
-    type: String // Store the QR code data URL here
   }
 
 });

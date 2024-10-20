@@ -43,7 +43,7 @@ function SignupPage() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // TODO: Handle signup form submission'
+  
     const form = document.forms.signUpform;
     let user = {
       firstName: form.firstName.value,
@@ -51,27 +51,66 @@ function SignupPage() {
       email: form.email.value,
       password: form.password.value,
       confirmPassword: form.confirmPassword.value,
-      userType: form.userType.value
-    }
+      userType: form.userType.value,
+    };
+  
     fetch('http://localhost:3001/signUp', {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(user)
+      body: JSON.stringify(user),
     })
       .then(response => response.json())
       .then(data => {
         let respMessage = data.message;
         if (respMessage === "success") {
-          setQrCode(data.qrCode); // Set the received QR code
-          handleQrCodeOpen(); // Open the QR code modal
+          // Check if the userType is 'Patient' before setting the QR code
+          if (user.userType === "Patient") {
+            setQrCode(data.qrCode); // Set the received QR code for patient users only
+            handleQrCodeOpen(); // Open the QR code modal
+          } else {
+            // Directly navigate to login for non-patient users
+            navigate("/login");
+          }
         } else {
           setErrorList(data.errors);
           handleDialogueOpen();
         }
       });
   };
+
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   // TODO: Handle signup form submission'
+  //   const form = document.forms.signUpform;
+  //   let user = {
+  //     firstName: form.firstName.value,
+  //     lastName: form.lastName.value,
+  //     email: form.email.value,
+  //     password: form.password.value,
+  //     confirmPassword: form.confirmPassword.value,
+  //     userType: form.userType.value
+  //   }
+  //   fetch('http://localhost:3001/signUp', {
+  //     method: "POST",
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(user)
+  //   })
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       let respMessage = data.message;
+  //       if (respMessage === "success") {
+  //         setQrCode(data.qrCode); // Set the received QR code
+  //         handleQrCodeOpen(); // Open the QR code modal
+  //       } else {
+  //         setErrorList(data.errors);
+  //         handleDialogueOpen();
+  //       }
+  //     });
+  // };
 
   useEffect(() => {
     if (password.length > 0 && password?.trim()?.length <= 6) {
