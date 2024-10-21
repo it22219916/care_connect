@@ -63,3 +63,9 @@ app.use("/api/paypal", require("./routes/api/paypal"));
 app.get("/", (req, res) => {
   res.send("hello world");
 });
+
+if (process.env.NODE_ENV != "test") {
+  app.get("/api/config/paypal", (req, res) =>
+    res.send(process.env.PAYPAL_CLIENT_ID)
+  );
+}
