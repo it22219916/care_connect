@@ -21,6 +21,7 @@ import {
 import DialogContent from "@mui/material/DialogContent";
 import AppointmentForm from "../Forms/AppointmentForm";
 import AppointmentTable from "../MUITable/AppointmentTable";
+import Config from "../config";
 
 function PatientAppointment() {
   const navigate = useNavigate();
@@ -80,15 +81,11 @@ function PatientAppointment() {
     };
     // console.log("reqObj",reqObj);
 
-    let response = await axios.put(
-      `http://localhost:3001/appointments/`,
-      reqObj,
-      {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    let response = await axios.put(Config.get("getAppointments"), reqObj, {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     if (response.data.message == "success") {
       // getAvailableSlot();
       // window.alert("success add")
@@ -123,7 +120,7 @@ function PatientAppointment() {
     // setAvailableSlots(newSlotList);
     if (doctorSelected) {
       let response = await axios.post(
-        `http://localhost:3001/appointments`,
+        Config.get("getAppointments"),
         {
           isTimeSlotAvailable: true,
           appDate: formatDateForDateInput(date),
@@ -163,7 +160,7 @@ function PatientAppointment() {
     // setAvailableSlots(newSlotList);
     if (doctorSelected) {
       let response = await axios.post(
-        `http://localhost:3001/appointments`,
+        Config.get("getAppointments"),
         {
           isTimeSlotAvailable: false,
           appDate: formatDateForDateInput(date),
@@ -208,7 +205,7 @@ function PatientAppointment() {
 
   const deleteBookedSlots = async (appId) => {
     console.log("delete slot with id", appId);
-    let response = await axios.delete(`http://localhost:3001/appointments/`, {
+    let response = await axios.delete(Config.get("getAppointments"), {
       headers: {
         authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -225,7 +222,7 @@ function PatientAppointment() {
   };
 
   const getDoctorList = async () => {
-    let response = await axios.get(`http://localhost:3001/doctors`, {
+    let response = await axios.get(Config.get("getDoctors"), {
       headers: {
         authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -254,7 +251,7 @@ function PatientAppointment() {
   };
 
   const getDepartmentList = async () => {
-    let response = await axios.get(`http://localhost:3001/departments`, {
+    let response = await axios.get(Config.get("getDepartments"), {
       headers: {
         authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -268,7 +265,7 @@ function PatientAppointment() {
   };
 
   const getPatients = async () => {
-    const response = await axios.get(`http://localhost:3001/patients`);
+    const response = await axios.get(Config.get("getPatients"));
     setPatientList(response.data);
   };
 

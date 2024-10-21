@@ -1,35 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import '../assets/css/signup.css';
-import { NavLink } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom';
-import ErrorDialogueBox from '../components/MUIDialogueBox/ErrorDialogueBox';
-
-
+import React, { useEffect, useState } from "react";
+import "../assets/css/signup.css";
+import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ErrorDialogueBox from "../components/MUIDialogueBox/ErrorDialogueBox";
+import Config from "../components/config";
 
 function SignupPage() {
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [userType, setUserType] = useState('');
-  const [passwordMatchDisplay, setPasswordMatchDisplay] = useState('none');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState("");
+  const [passwordMatchDisplay, setPasswordMatchDisplay] = useState("none");
   // const [passwordValidationDisplay, setPasswordValidationDisplay] = useState('none')
-  const [passwordValidationMessage, setPasswordValidationMessage] = useState('')
+  const [passwordValidationMessage, setPasswordValidationMessage] =
+    useState("");
 
-
-  const [errorDialogueBoxOpen,setErrorDialogueBoxOpen] = useState(false);
-  const [errorList,setErrorList] = useState([]);
+  const [errorDialogueBoxOpen, setErrorDialogueBoxOpen] = useState(false);
+  const [errorList, setErrorList] = useState([]);
   const handleDialogueOpen = () => {
-    setErrorDialogueBoxOpen(true)
+    setErrorDialogueBoxOpen(true);
   };
   const handleDialogueClose = () => {
     setErrorList([]);
-    setErrorDialogueBoxOpen(false)
+    setErrorDialogueBoxOpen(false);
   };
-
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -41,59 +39,55 @@ function SignupPage() {
       email: form.email.value,
       password: form.password.value,
       confirmPassword: form.confirmPassword.value,
-      userType: form.userType.value
-    }
-    fetch('http://localhost:3001/signUp',{
+      userType: form.userType.value,
+    };
+    fetch(Config.get("postSignUp"), {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(user) 
+      body: JSON.stringify(user),
     })
-            .then(response => response.json())
-            .then(data => {
-                let respMessage = data.message;
-                if(respMessage==="success"){
-                  navigate("/");
-                }
-                else{
-                  //TODO: display error message
-                  setErrorList(data.errors);
-                  handleDialogueOpen();
-                }
-            });
+      .then((response) => response.json())
+      .then((data) => {
+        let respMessage = data.message;
+        if (respMessage === "success") {
+          navigate("/");
+        } else {
+          //TODO: display error message
+          setErrorList(data.errors);
+          handleDialogueOpen();
+        }
+      });
   };
 
   useEffect(() => {
-    if (password.length>0 && password?.trim()?.length <= 6) {
-      setPasswordValidationMessage('Password Length must be greater than 6 characters');
+    if (password.length > 0 && password?.trim()?.length <= 6) {
+      setPasswordValidationMessage(
+        "Password Length must be greater than 6 characters"
+      );
       // setPasswordValidationDisplay('block');
-    }
-    else {
-      setPasswordValidationMessage('');
+    } else {
+      setPasswordValidationMessage("");
       // setPasswordValidationDisplay('none');
     }
     if (password === confirmPassword) {
-      setPasswordMatchDisplay('none');
+      setPasswordMatchDisplay("none");
+    } else {
+      setPasswordMatchDisplay("block");
     }
-    else {
-      setPasswordMatchDisplay('block');
-    }
-  }, [password, confirmPassword])
+  }, [password, confirmPassword]);
 
   return (
     <div id="signUpBody">
-      
       <div id="signUpBG">
-        <div className='greenLayer'>
-
-        </div>
+        <div className="greenLayer"></div>
       </div>
       <div className="signup-form">
         <h2>Create An Account</h2>
-        <form id="signUpform" name='signUpform' onSubmit={handleSubmit}>
-          <div className='d-flex flex-row mt-5'>
-            <div className='col-6 form-floating mx-2 '>
+        <form id="signUpform" name="signUpform" onSubmit={handleSubmit}>
+          <div className="d-flex flex-row mt-5">
+            <div className="col-6 form-floating mx-2 ">
               <input
                 type="text"
                 id="firstName"
@@ -106,7 +100,7 @@ function SignupPage() {
               />
               <label htmlFor="firstName">First Name</label>
             </div>
-            <div className='col-6 form-floating mx-2'>
+            <div className="col-6 form-floating mx-2">
               <input
                 type="text"
                 id="lastName"
@@ -120,7 +114,7 @@ function SignupPage() {
               <label htmlFor="lastName">Last Name</label>
             </div>
           </div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+          <div className="form-floating mt-3 col-12 mx-2">
             <input
               type="email"
               id="email"
@@ -131,9 +125,9 @@ function SignupPage() {
               required
               className="form-control"
             />
-            <label htmlFor="email" >Email</label>
+            <label htmlFor="email">Email</label>
           </div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+          <div className="form-floating mt-3 col-12 mx-2">
             <input
               type="password"
               id="password"
@@ -146,10 +140,8 @@ function SignupPage() {
             />
             <label htmlFor="password">Password</label>
           </div>
-          <div
-            className="mx-2 text-danger"
-            > {passwordValidationMessage}</div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+          <div className="mx-2 text-danger"> {passwordValidationMessage}</div>
+          <div className="form-floating mt-3 col-12 mx-2">
             <input
               type="password"
               id="confirmPassword"
@@ -165,9 +157,13 @@ function SignupPage() {
           <div
             className="mx-2 text-danger"
             style={{
-              display: `${passwordMatchDisplay}`
-            }}> Password did not match</div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+              display: `${passwordMatchDisplay}`,
+            }}
+          >
+            {" "}
+            Password did not match
+          </div>
+          <div className="form-floating mt-3 col-12 mx-2">
             <select
               id="userType"
               name="userType"
@@ -184,24 +180,35 @@ function SignupPage() {
             <label htmlFor="userType">User Type</label>
           </div>
           <div className="form-group form-check mt-5 mx-2">
-            <input type="checkbox" className="form-check-input" id="terms-chkbox" required />
-            <label className='' htmlFor="terms-chkbox">I agree with the terms and conditons</label>
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="terms-chkbox"
+              required
+            />
+            <label className="" htmlFor="terms-chkbox">
+              I agree with the terms and conditons
+            </label>
           </div>
-          <div className='text-center'>
-            <button id="signUp" type="submit">Sign Up</button>
+          <div className="text-center">
+            <button id="signUp" type="submit">
+              Sign Up
+            </button>
           </div>
-          <div className='text-center'>
-            Already have an account? <NavLink to="/login" exact >Sign In</NavLink>
+          <div className="text-center">
+            Already have an account?{" "}
+            <NavLink to="/login" exact>
+              Sign In
+            </NavLink>
           </div>
-
         </form>
       </div>
       <ErrorDialogueBox
         open={errorDialogueBoxOpen}
         handleToClose={handleDialogueClose}
         ErrorTitle="Error Signing Up"
-        ErrorList = {errorList}
-       />
+        ErrorList={errorList}
+      />
     </div>
   );
 }

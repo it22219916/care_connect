@@ -3,6 +3,7 @@ import axios from "axios";
 import { UserContext } from "../../Context/UserContext";
 import { PayPalButton } from "react-paypal-button-v2";
 import Loader from "../Loader";
+import Config from "../config";
 
 function AppointmentForm(props) {
   const { currentUser } = useContext(UserContext);
@@ -128,7 +129,7 @@ function AppointmentForm(props) {
             <Loader />
           ) : (
             <PayPalButton
-              clientId="AUUc1QZinPQRjUl0qfWm1x4Rnx3nK29ah1LEz0NV4hRULbrjCWUqthKnu8uRxPQ1PNcqNZ6fThvZ0t1v"
+              clientId={Config.get("paypalClientId")}
               key={currentUser._id}
               amount={5}
               onSuccess={SubmitEvent}

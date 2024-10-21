@@ -1,32 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom';
-import ErrorDialogueBox from '../MUIDialogueBox/ErrorDialogueBox';
-import Box from '@mui/material/Box';
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ErrorDialogueBox from "../MUIDialogueBox/ErrorDialogueBox";
+import Box from "@mui/material/Box";
+import Config from "../config";
 
 function AddPatient() {
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [gender, setGender] = useState('');
-  const [dob, setDOB] = useState('');
-  const [passwordMatchDisplay, setPasswordMatchDisplay] = useState('none');
-  const [passwordValidationMessage, setPasswordValidationMessage] = useState('')
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [gender, setGender] = useState("");
+  const [dob, setDOB] = useState("");
+  const [passwordMatchDisplay, setPasswordMatchDisplay] = useState("none");
+  const [passwordValidationMessage, setPasswordValidationMessage] =
+    useState("");
   const [errorDialogueBoxOpen, setErrorDialogueBoxOpen] = useState(false);
   const [errorList, setErrorList] = useState([]);
   const handleDialogueOpen = () => {
-    setErrorDialogueBoxOpen(true)
+    setErrorDialogueBoxOpen(true);
   };
   const handleDialogueClose = () => {
     setErrorList([]);
-    setErrorDialogueBoxOpen(false)
+    setErrorDialogueBoxOpen(false);
   };
 
   const addPatient = (event) => {
@@ -43,25 +45,23 @@ function AddPatient() {
       confirmPassword: form.confirmPassword.value,
       address: form.address.value,
       gender: form.gender.value,
-      dob: form.dob.value
-    }
+      dob: form.dob.value,
+    };
 
-
-    fetch('http://localhost:3001/patients', {
+    fetch(Config.get("getPatients"), {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(patient)
+      body: JSON.stringify(patient),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log(data);
         let respMessage = data.message;
         if (respMessage === "success") {
           navigate("/patients");
-        }
-        else {
+        } else {
           //Display error message
           setErrorList(data.errors);
           handleDialogueOpen();
@@ -71,24 +71,23 @@ function AddPatient() {
 
   useEffect(() => {
     if (password.length > 0 && password?.trim()?.length <= 6) {
-      setPasswordValidationMessage('Password Length must be greater than 6 characters');
-    }
-    else {
-      setPasswordValidationMessage('');
+      setPasswordValidationMessage(
+        "Password Length must be greater than 6 characters"
+      );
+    } else {
+      setPasswordValidationMessage("");
     }
     if (password === confirmPassword) {
-      setPasswordMatchDisplay('none');
+      setPasswordMatchDisplay("none");
+    } else {
+      setPasswordMatchDisplay("block");
     }
-    else {
-      setPasswordMatchDisplay('block');
-    }
-  }, [password, confirmPassword])
+  }, [password, confirmPassword]);
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <div className="page-wrapper">
         <div className="content">
-
           <div className="card-box">
             <div className="row">
               <div className="col-lg-8 offset-lg-2">
@@ -96,62 +95,126 @@ function AddPatient() {
               </div>
             </div>
             <div className="row">
-
               <div className="col-lg-8 offset-lg-2">
-                <form id="addPatientForm" name='addPatientForm' onSubmit={addPatient}>
+                <form
+                  id="addPatientForm"
+                  name="addPatientForm"
+                  onSubmit={addPatient}
+                >
                   <div className="row">
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>First Name <span className="text-danger">*</span></label>
-                        <input name="firstName" className="form-control" type="text" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
+                        <label>
+                          First Name <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          name="firstName"
+                          className="form-control"
+                          type="text"
+                          value={firstName}
+                          onChange={(event) => setFirstName(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Last Name</label>
-                        <input name="lastName" className="form-control" type="text" value={lastName} onChange={(event) => setLastName(event.target.value)} />
+                        <input
+                          name="lastName"
+                          className="form-control"
+                          type="text"
+                          value={lastName}
+                          onChange={(event) => setLastName(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>Username <span className="text-danger">*</span></label>
-                        <input name="username" className="form-control" type="text" value={username} onChange={(event) => setUsername(event.target.value)} />
+                        <label>
+                          Username <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          name="username"
+                          className="form-control"
+                          type="text"
+                          value={username}
+                          onChange={(event) => setUsername(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>Email <span className="text-danger">*</span></label>
-                        <input name="email" className="form-control" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+                        <label>
+                          Email <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          name="email"
+                          className="form-control"
+                          type="email"
+                          value={email}
+                          onChange={(event) => setEmail(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Password</label>
-                        <input name="password" className="form-control" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+                        <input
+                          name="password"
+                          className="form-control"
+                          type="password"
+                          value={password}
+                          onChange={(event) => setPassword(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Confirm Password</label>
-                        <input name="confirmPassword" className="form-control" type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
+                        <input
+                          name="confirmPassword"
+                          className="form-control"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(event) =>
+                            setConfirmPassword(event.target.value)
+                          }
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Phone </label>
-                        <input name="phone" className="form-control" type="text" value={phone} onChange={(event) => setPhone(event.target.value)} />
+                        <input
+                          name="phone"
+                          className="form-control"
+                          type="text"
+                          value={phone}
+                          onChange={(event) => setPhone(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Address </label>
-                        <input name="address" className="form-control" type="text" value={address} onChange={(event) => setAddress(event.target.value)} />
+                        <input
+                          name="address"
+                          className="form-control"
+                          type="text"
+                          value={address}
+                          onChange={(event) => setAddress(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Gender</label>
-                        <select name="gender" className="form-select" value={gender} onChange={(event) => setGender(event.target.value)}>
+                        <select
+                          name="gender"
+                          className="form-select"
+                          value={gender}
+                          onChange={(event) => setGender(event.target.value)}
+                        >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
                         </select>
@@ -160,14 +223,25 @@ function AddPatient() {
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Date of Birth </label>
-                        <input name="dob" className="form-control" type="date" value={dob} onChange={(event) => setDOB(event.target.value)} />
+                        <input
+                          name="dob"
+                          className="form-control"
+                          type="date"
+                          value={dob}
+                          onChange={(event) => setDOB(event.target.value)}
+                        />
                       </div>
                     </div>
-
                   </div>
 
                   <div className="m-t-20 text-center">
-                    <button id="addPatient" type="submit" className="btn btn-primary submit-btn">Create Patient</button>
+                    <button
+                      id="addPatient"
+                      type="submit"
+                      className="btn btn-primary submit-btn"
+                    >
+                      Create Patient
+                    </button>
                   </div>
                 </form>
               </div>
@@ -182,7 +256,7 @@ function AddPatient() {
         />
       </div>
     </Box>
-  )
+  );
 }
 
 export default AddPatient;

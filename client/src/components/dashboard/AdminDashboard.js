@@ -6,6 +6,7 @@ import axios from "axios";
 import { NavLink } from "react-router-dom";
 import moment from "moment";
 import { UserContext } from "../../Context/UserContext";
+import Config from "../config";
 
 export default function AdminDashboard() {
   const [doctorCount, setDoctorCount] = useState(0);
@@ -18,7 +19,7 @@ export default function AdminDashboard() {
 
   const getUserCountByRole = async (userType) => {
     const response = await axios.post(
-      `http://localhost:3001/count/users`,
+      Config.get("countUsers"),
       {
         userType: userType,
       },
@@ -36,14 +37,11 @@ export default function AdminDashboard() {
   };
 
   const getAppointmentCount = async () => {
-    const response = await axios.get(
-      `http://localhost:3001/count/appointments`,
-      {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await axios.get(Config.get("countAppointments"), {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     if (response?.data?.totalAppointments) {
       setAppsTodayCount(response?.data?.totalAppointments);
     }
@@ -55,7 +53,7 @@ export default function AdminDashboard() {
   const getBookedSlots = async () => {
     // console.log(moment(new Date()).format('YYYY-MM-DD'))
     let response = await axios.post(
-      `http://localhost:3001/appointments`,
+      Config.get("getAppointments"),
       {
         isTimeSlotAvailable: false,
         appDate: moment(new Date()).format("YYYY-MM-DD"),
@@ -80,7 +78,7 @@ export default function AdminDashboard() {
   };
 
   const getdoctors = async () => {
-    const response = await axios.get("http://localhost:3001/doctors");
+    const response = await axios.get(Config.get("getDoctors"));
     setdoctor(response.data);
   };
 

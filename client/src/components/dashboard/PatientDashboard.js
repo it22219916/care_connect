@@ -8,10 +8,11 @@ import moment from "moment";
 import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import Button from "@mui/material/Button";
 import { QRCodeCanvas } from "qrcode.react";
+import Config from "../config";
 
 export default function PatientDashboard() {
   const { currentUser } = useContext(UserContext); // Use currentUser._id as the user identifier
-  const [qrValue, setQrValue] = useState({currentUser}); // QR Code value
+  const [qrValue, setQrValue] = useState({ currentUser }); // QR Code value
   const [firstAppointmentInFuture, setFirstAppointmentInFuture] = useState({});
   const [prescriptions, setPrescription] = useState([]);
 
@@ -56,7 +57,7 @@ export default function PatientDashboard() {
   const getBookedSlots = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3001/appointments`,
+        Config.get("getAppointments"),
         { isTimeSlotAvailable: false },
         {
           headers: {
@@ -99,7 +100,7 @@ export default function PatientDashboard() {
   const getPrescription = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3001/prescriptions`,
+        Config.get("getPrescriptions"),
         {},
         {
           headers: {
@@ -138,14 +139,21 @@ export default function PatientDashboard() {
   }, [currentUser]);
 
   return (
-    <Box className={styles.dashboardBody} component="main" sx={{ flexGrow: 1, p: 3 }}>
+    <Box
+      className={styles.dashboardBody}
+      component="main"
+      sx={{ flexGrow: 1, p: 3 }}
+    >
       <div id={styles.welcomeBanner}>
         <div className="text-white">
           <h3>Welcome!</h3>
-          <h4>{currentUser.firstName} {currentUser.lastName}</h4>
+          <h4>
+            {currentUser.firstName} {currentUser.lastName}
+          </h4>
           <div className={styles.horizontalLine}></div>
-          At Care Connect, we believe that every patient deserves the highest quality care possible.
-          Our commitment to excellence in healthcare is matched only by our compassion for those we serve.
+          At Care Connect, we believe that every patient deserves the highest
+          quality care possible. Our commitment to excellence in healthcare is
+          matched only by our compassion for those we serve.
         </div>
       </div>
 
@@ -159,7 +167,8 @@ export default function PatientDashboard() {
             <div className="text-center">
               {qrValue ? (
                 <>
-                  <QRCodeCanvas value={qrValue} size={150} /> {/* Shows patient ID */}
+                  <QRCodeCanvas value={qrValue} size={150} />{" "}
+                  {/* Shows patient ID */}
                   <p className="mt-3">Scan this code for your details</p>
                 </>
               ) : (

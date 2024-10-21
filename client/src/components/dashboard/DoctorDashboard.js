@@ -6,6 +6,7 @@ import { UserContext } from "../../Context/UserContext";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import Config from "../config";
 
 export default function DoctorDashboard() {
   const { currentUser } = useContext(UserContext);
@@ -16,14 +17,11 @@ export default function DoctorDashboard() {
   const [prescriptions, setPrescription] = useState([]);
 
   const getAppointmentCount = async () => {
-    const response = await axios.get(
-      `http://localhost:3001/count/appointments`,
-      {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await axios.get(Config.get("countAppointments"), {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     if (response?.data?.totalAppointments) {
       setAppsTodayCount(response?.data?.totalAppointments);
     }
@@ -33,14 +31,11 @@ export default function DoctorDashboard() {
   };
 
   const getPatientsTreatedCount = async () => {
-    const response = await axios.get(
-      `http://localhost:3001/count/patients/treated`,
-      {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await axios.get(Config.get("countPatientsTreated"), {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     if (response?.data?.treatedPatients) {
       setPatientsTreatedCount(response?.data?.treatedPatients);
     }
@@ -49,7 +44,7 @@ export default function DoctorDashboard() {
   const getBookedSlots = async () => {
     // console.log(moment(new Date()).format('YYYY-MM-DD'))
     let response = await axios.post(
-      `http://localhost:3001/appointments`,
+      Config.get("getAppointments"),
       {
         isTimeSlotAvailable: false,
         appDate: moment(new Date()).format("YYYY-MM-DD"),
@@ -74,7 +69,7 @@ export default function DoctorDashboard() {
   };
   const getPrescription = async () => {
     let response = await axios.post(
-      `http://localhost:3001/prescriptions`,
+      Config.get("getPrescriptions"),
       {},
       {
         headers: {

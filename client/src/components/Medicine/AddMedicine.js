@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom';
-import ErrorDialogueBox from '../MUIDialogueBox/ErrorDialogueBox';
-import Box from '@mui/material/Box';
-
-
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ErrorDialogueBox from "../MUIDialogueBox/ErrorDialogueBox";
+import Box from "@mui/material/Box";
+import Config from "../config";
 
 function Addmedicine() {
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [company, setCompany] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [company, setCompany] = useState("");
 
   const [errorDialogueBoxOpen, setErrorDialogueBoxOpen] = useState(false);
   const [errorList, setErrorList] = useState([]);
   const handleDialogueOpen = () => {
-    setErrorDialogueBoxOpen(true)
+    setErrorDialogueBoxOpen(true);
   };
   const handleDialogueClose = () => {
     setErrorList([]);
-    setErrorDialogueBoxOpen(false)
+    setErrorDialogueBoxOpen(false);
   };
-
 
   const addmedicine = (event) => {
     event.preventDefault();
@@ -33,25 +31,23 @@ function Addmedicine() {
       name: form.name.value,
       description: form.description.value,
       price: form.price.value,
-      company: form.company.value
-    }
+      company: form.company.value,
+    };
 
-
-    fetch('http://localhost:3001/medicines', {
+    fetch(Config.get("getMedicines"), {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(medicine)
+      body: JSON.stringify(medicine),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log(data);
         let respMessage = data.message;
         if (respMessage === "success") {
           navigate("/medicines");
-        }
-        else {
+        } else {
           //Display error message
           setErrorList(data.errors);
           handleDialogueOpen();
@@ -59,13 +55,10 @@ function Addmedicine() {
       });
   };
 
-
-
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <div className="page-wrapper">
         <div className="content">
-
           <div className="card-box">
             <div className="row">
               <div className="col-lg-8 offset-lg-2">
@@ -73,40 +66,83 @@ function Addmedicine() {
               </div>
             </div>
             <div className="row">
-
               <div className="col-lg-8 offset-lg-2">
-                <form id="addmedicineForm" name='addmedicineForm' onSubmit={addmedicine}>
+                <form
+                  id="addmedicineForm"
+                  name="addmedicineForm"
+                  onSubmit={addmedicine}
+                >
                   <div className="row">
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>Brand <span className="text-danger">*</span></label>
-                        <input name="company" className="form-control" type="text" required value={company} onChange={(event) => setCompany(event.target.value)} />
+                        <label>
+                          Brand <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          name="company"
+                          className="form-control"
+                          type="text"
+                          required
+                          value={company}
+                          onChange={(event) => setCompany(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>Medicine Name <span className="text-danger">*</span></label>
-                        <input name="name" className="form-control" type="text" required value={name} onChange={(event) => setName(event.target.value)} />
+                        <label>
+                          Medicine Name <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          name="name"
+                          className="form-control"
+                          type="text"
+                          required
+                          value={name}
+                          onChange={(event) => setName(event.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Description</label>
-                        <input name="description" className="form-control" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
+                        <input
+                          name="description"
+                          className="form-control"
+                          type="text"
+                          value={description}
+                          onChange={(event) =>
+                            setDescription(event.target.value)
+                          }
+                        />
                       </div>
                     </div>
 
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>Price <span className="text-danger">*</span></label>
-                        <input name="price" className="form-control" type="number" required value={price} onChange={(event) => setPrice(event.target.value)} />
+                        <label>
+                          Price <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          name="price"
+                          className="form-control"
+                          type="number"
+                          required
+                          value={price}
+                          onChange={(event) => setPrice(event.target.value)}
+                        />
                       </div>
                     </div>
-
                   </div>
 
                   <div className="m-t-20 text-center">
-                    <button id="addmedicine" type="submit" className="btn btn-primary submit-btn">Create medicine</button>
+                    <button
+                      id="addmedicine"
+                      type="submit"
+                      className="btn btn-primary submit-btn"
+                    >
+                      Create medicine
+                    </button>
                   </div>
                 </form>
               </div>
@@ -121,7 +157,7 @@ function Addmedicine() {
         />
       </div>
     </Box>
-  )
+  );
 }
 
 export default Addmedicine;

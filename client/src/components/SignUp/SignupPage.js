@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import styles from './SignUp.module.css';
-import { NavLink } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom';
-import ErrorDialogueBox from '../MUIDialogueBox/ErrorDialogueBox';
-import { QRCodeCanvas } from 'qrcode.react'; // Import the QR code component
-import { Modal } from '@mui/material';  // Import the modal component from Material UI
-
+import React, { useEffect, useState } from "react";
+import styles from "./SignUp.module.css";
+import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ErrorDialogueBox from "../MUIDialogueBox/ErrorDialogueBox";
+import { QRCodeCanvas } from "qrcode.react"; // Import the QR code component
+import { Modal } from "@mui/material"; // Import the modal component from Material UI
+import Config from "../config";
 
 function SignupPage() {
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [userType, setUserType] = useState('');
-  const [passwordMatchDisplay, setPasswordMatchDisplay] = useState('none');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState("");
+  const [passwordMatchDisplay, setPasswordMatchDisplay] = useState("none");
   // const [passwordValidationDisplay, setPasswordValidationDisplay] = useState('none')
-  const [passwordValidationMessage, setPasswordValidationMessage] = useState('')
-  const [qrCode, setQrCode] = useState(''); // State to hold the QR code data
+  const [passwordValidationMessage, setPasswordValidationMessage] =
+    useState("");
+  const [qrCode, setQrCode] = useState(""); // State to hold the QR code data
   const [qrCodeOpen, setQrCodeOpen] = useState(false); // Control QR code modal visibility
-
 
   const [errorDialogueBoxOpen, setErrorDialogueBoxOpen] = useState(false);
   const [errorList, setErrorList] = useState([]);
   const handleDialogueOpen = () => {
-    setErrorDialogueBoxOpen(true)
+    setErrorDialogueBoxOpen(true);
   };
   const handleDialogueClose = () => {
     setErrorList([]);
-    setErrorDialogueBoxOpen(false)
+    setErrorDialogueBoxOpen(false);
   };
 
   const handleQrCodeOpen = () => setQrCodeOpen(true); // Open QR code modal
@@ -43,7 +43,7 @@ function SignupPage() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-  
+
     const form = document.forms.signUpform;
     let user = {
       firstName: form.firstName.value,
@@ -53,16 +53,16 @@ function SignupPage() {
       confirmPassword: form.confirmPassword.value,
       userType: form.userType.value,
     };
-  
-    fetch('http://localhost:3001/signUp', {
+
+    fetch(Config.get("postSignUp"), {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(user),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         let respMessage = data.message;
         if (respMessage === "success") {
           // Check if the userType is 'Patient' before setting the QR code
@@ -114,34 +114,31 @@ function SignupPage() {
 
   useEffect(() => {
     if (password.length > 0 && password?.trim()?.length <= 6) {
-      setPasswordValidationMessage('Password Length must be greater than 6 characters');
+      setPasswordValidationMessage(
+        "Password Length must be greater than 6 characters"
+      );
       // setPasswordValidationDisplay('block');
-    }
-    else {
-      setPasswordValidationMessage('');
+    } else {
+      setPasswordValidationMessage("");
       // setPasswordValidationDisplay('none');
     }
     if (password === confirmPassword) {
-      setPasswordMatchDisplay('none');
+      setPasswordMatchDisplay("none");
+    } else {
+      setPasswordMatchDisplay("block");
     }
-    else {
-      setPasswordMatchDisplay('block');
-    }
-  }, [password, confirmPassword])
+  }, [password, confirmPassword]);
 
   return (
     <div id={styles.signUpBody}>
-
       <div id={styles.signUpBG}>
-        <div className={styles.greenLayer}>
-
-        </div>
+        <div className={styles.greenLayer}></div>
       </div>
       <div>
         <h2>Create An Account</h2>
-        <form id={styles.signUpform} name='signUpform' onSubmit={handleSubmit}>
-          <div className='d-flex flex-column flex-lg-row flex-sm-column mt-5'>
-            <div className='col-12 col-sm-12 col-lg-6  form-floating mx-2 '>
+        <form id={styles.signUpform} name="signUpform" onSubmit={handleSubmit}>
+          <div className="d-flex flex-column flex-lg-row flex-sm-column mt-5">
+            <div className="col-12 col-sm-12 col-lg-6  form-floating mx-2 ">
               <input
                 type="text"
                 id="firstName"
@@ -154,7 +151,7 @@ function SignupPage() {
               />
               <label htmlFor="firstName">First Name</label>
             </div>
-            <div className='col-12  col-sm-12 col-lg-6  mt-3 mt-sm-3 mt-lg-0 form-floating mx-2'>
+            <div className="col-12  col-sm-12 col-lg-6  mt-3 mt-sm-3 mt-lg-0 form-floating mx-2">
               <input
                 type="text"
                 id="lastName"
@@ -168,7 +165,7 @@ function SignupPage() {
               <label htmlFor="lastName">Last Name</label>
             </div>
           </div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+          <div className="form-floating mt-3 col-12 mx-2">
             <input
               type="email"
               id="email"
@@ -179,9 +176,9 @@ function SignupPage() {
               required
               className="form-control"
             />
-            <label htmlFor="email" >Email</label>
+            <label htmlFor="email">Email</label>
           </div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+          <div className="form-floating mt-3 col-12 mx-2">
             <input
               type="password"
               id="password"
@@ -194,10 +191,8 @@ function SignupPage() {
             />
             <label htmlFor="password">Password</label>
           </div>
-          <div
-            className="mx-2 text-danger"
-          > {passwordValidationMessage}</div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+          <div className="mx-2 text-danger"> {passwordValidationMessage}</div>
+          <div className="form-floating mt-3 col-12 mx-2">
             <input
               type="password"
               id="confirmPassword"
@@ -213,9 +208,13 @@ function SignupPage() {
           <div
             className="mx-2 text-danger"
             style={{
-              display: `${passwordMatchDisplay}`
-            }}> Password did not match</div>
-          <div className='form-floating mt-3 col-12 mx-2'>
+              display: `${passwordMatchDisplay}`,
+            }}
+          >
+            {" "}
+            Password did not match
+          </div>
+          <div className="form-floating mt-3 col-12 mx-2">
             <select
               id="userType"
               name="userType"
@@ -232,16 +231,27 @@ function SignupPage() {
             <label htmlFor="userType">User Type</label>
           </div>
           <div className="form-group form-check mt-5 mx-2">
-            <input type="checkbox" className="form-check-input" id="terms-chkbox" required />
-            <label className='' htmlFor="terms-chkbox">I agree with the terms and conditons</label>
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="terms-chkbox"
+              required
+            />
+            <label className="" htmlFor="terms-chkbox">
+              I agree with the terms and conditons
+            </label>
           </div>
-          <div className='text-center'>
-            <button id={styles.signUpBtn} type="submit">Sign Up</button>
+          <div className="text-center">
+            <button id={styles.signUpBtn} type="submit">
+              Sign Up
+            </button>
           </div>
-          <div className='text-center'>
-            Already have an account? <NavLink to="/login" exact >Sign In</NavLink>
+          <div className="text-center">
+            Already have an account?{" "}
+            <NavLink to="/login" exact>
+              Sign In
+            </NavLink>
           </div>
-
         </form>
       </div>
       {/* QR Code Modal */}
@@ -253,11 +263,20 @@ function SignupPage() {
       >
         <div className={styles.modalContainer}>
           <h2 id="qr-code-modal-title">Your QR Code</h2>
-          <p>This QR code contains your account details. A doctor or receptionist can scan it to retrieve your information.</p>
+          <p>
+            This QR code contains your account details. A doctor or receptionist
+            can scan it to retrieve your information.
+          </p>
           <QRCodeCanvas value={qrCode} size={256} /> {/* Display the QR code */}
           <div className={styles.modalButtons}>
-            <button className="proceed" onClick={handleProceedToLogin}>Proceed to Login</button> {/* Proceed to login button */}
-            <button className="close" onClick={handleQrCodeClose}>Close</button> {/* Close the modal */}
+            <button className="proceed" onClick={handleProceedToLogin}>
+              Proceed to Login
+            </button>{" "}
+            {/* Proceed to login button */}
+            <button className="close" onClick={handleQrCodeClose}>
+              Close
+            </button>{" "}
+            {/* Close the modal */}
           </div>
         </div>
       </Modal>
